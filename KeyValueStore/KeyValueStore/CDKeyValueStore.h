@@ -80,8 +80,8 @@
 - (void)deleteObjectsByIdPrefix:(NSString *)objectIdPrefix fromTable:(NSString *)tableName;
 
 
-
-
+//===========事务 批量更新数据==============
+- (void)transactionPutObject:(NSArray *)objectArray intoTable:(NSString *)tableName;
 
 
 

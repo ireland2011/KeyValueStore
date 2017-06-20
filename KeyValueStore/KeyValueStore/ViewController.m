@@ -21,21 +21,26 @@
     [super viewDidLoad];
     
     self.db = [[CDKeyValueStore alloc] initDBWithName:@"cd.db"];
-    [self.db creatTableWithName:@"goodDetail"];
-    [self.db putString:@"hello world" withId:@"123" fromTable:@"goodDetail"];
+    [self.db clearTable:@"goodDetail"];
+    
+    //
+    NSMutableArray *arrayM = [NSMutableArray array];
+    for (int i = 0; i < 10000; i++) {
+        [arrayM addObject:@(i)];
+    }
+    
+    [self.db transactionPutObject:arrayM intoTable:@"goodDetail"];
     
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSString *str = [self.db getStringById:@"123" fromTable:@"goodDetail"];
-    NSLog(@"%@", str);
+    [self.db putNumber:@(123456) withId:@"1" intoTable:@"goodDetail"];
+    NSArray *arrayM = [self.db getAllItemsFromTable:@"goodDetail"];
+    
+    NSLog(@"%@", arrayM);
 }
 
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
 
 @end

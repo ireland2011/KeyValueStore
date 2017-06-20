@@ -479,6 +479,44 @@ static NSString *const DROP_TABLE_SQL = @"DROP TABLE '%@' ";
 
 
 
+
+
+//===========事务 批量更新数据==============
+- (void)transactionPutObject:(NSArray *)objectArray intoTable:(NSString *)tableName {
+    CHECKTABLNAME
+    
+    [_dbQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
+        
+        @try {
+            for (int i = 0; i < objectArray.count; i++) {
+                id object = objectArray[i];
+                
+                NSError *error;
+                NSData *data = [NSJSONSerialization dataWithJSONObject:@[object] options:0 error:&error];
+                if (error) { debugLog(@"ERROR, failed to get json data"); return; }
+                
+                NSDate *creatTime = [NSDate date];
+                NSString *sql = [NSString stringWithFormat:UPDATE_ITEM_SQL, tableName];
+                NSString *jsonString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                NSString *objectId = [NSString stringWithFormat:@"%d", i];
+                
+                BOOL result = [db executeUpdate:sql, objectId, jsonString, creatTime];
+                if (!result) {
+                    debugLog(@"ERROR, failed to insert into table and value: %@, %@", tableName, object);
+                }
+            }
+            
+        } @catch (NSException *exception) {
+            debugLog(@"ERROR, failed to insert into table userInfo: %@  %@", exception.reason, exception.description);
+            *rollback = YES;
+            
+        } @finally {
+            
+        }
+        
+    }];
+}
+
 @end
 
 
